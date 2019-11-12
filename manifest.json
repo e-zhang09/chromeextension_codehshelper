@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+
+  "name": "CodeHS Helper",
+  "version": "0.1.0",
+  "description": "wip extension",
+
+  "content_scripts": [{
+    "css": ["styles.css"],
+    "js": ["content.js"],
+    "run_at": "document_idle",
+    "matches": ["https://codehs.com/*"]
+  }],
+  "permissions": [
+    "storage"
+  ]
+}
