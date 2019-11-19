@@ -1,8 +1,9 @@
 console.info('content js loaded from extension');
 
 let curHistory = [];
+//todo check if page has been loaded to next user
 
-setTimeout(() => {
+setTimeout(async () => {
     if (document.getElementById('max-points') == null) {
 
     } else {
@@ -16,10 +17,12 @@ setTimeout(() => {
 
         if (!exist) {
             let button = document.createElement('button');
-            button.innerText = 'SMART';
+            button.innerHTML = "<div class='ld ld-ball ld-bounce'></div>SMART";
             button.classList.add('btn-main-extra-almost');
+            button.classList.add('ld-ext-left');
             button.id = 'main-btn-ddabd64960e52bf54ef4bc3999e3368ce09f2773';
             button.onclick = function (e) {
+                button.classList.add('running');
                 let needsWorkButton = document.getElementsByClassName('js-needs-work')[0];
                 let fullPointsButton = document.getElementsByClassName('js-give-full-points')[0];
 
@@ -97,7 +100,7 @@ setTimeout(() => {
                 console.info('history retrieved', items);
                 items.history_items.reverse();
                 console.info(items.history_items.forEach(obj => {
-                    historyList.appendChild(createUserDisplay(obj.studentName, obj.feedback, obj.curLink, obj.scoreGiven, obj.maxPoints))
+                    historyList.appendChild(createUserDisplay(obj.studentName, obj.feedback, obj.curLink, obj.scoreGiven, obj.maxPoints, obj.assignmentName))
                 }))
             });
         }
@@ -138,4 +141,39 @@ setTimeout(() => {
             return history_childContainer;
         };
     }
-}, 1000);
+}, 2000);
+
+let mutationObserverEventDummy = document.createElement("div");
+//todo broadcast and listen to events on this object
+
+MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+let observer = new MutationObserver(function(mutations, observer) {
+    // fired when a mutation occurs
+
+
+
+    console.log(mutations, observer);
+    // ...
+});
+
+// define what element should be observed by the observer
+// and what types of mutations trigger the callback
+observer.observe(document, {
+    subtree: true,
+    characterData: true
+    //...
+});
+
+function checkForPageUpdate (prevNumRemaining){
+    return new Promise((resolve, reject) => {
+         let retryCounter = 0;
+         setInterval(()=> {
+             if(retryCounter >= 40) reject('retried too many times');
+             retryCounter ++;
+
+
+
+         }, 500)
+    });
+}

@@ -6,7 +6,7 @@
   "description": "wip extension",
 
   "content_scripts": [{
-    "css": ["styles.css"],
+    "css": ["css/styles.css", "css/loading.css", "css/loading-btn.css"],
     "js": ["content.js"],
     "run_at": "document_idle",
     "matches": ["https://codehs.com/*"]
