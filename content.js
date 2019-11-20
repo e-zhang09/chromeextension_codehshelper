@@ -154,9 +154,14 @@ let interval_checkAvail = setInterval(() => {
 
             let historyList = document.createElement('ul');
             historyList.id = 'ul-history-70c881d4a26984ddce795f6f71817c9cf4480e79';
+            historyList.style.maxHeight = '0';
+            historyList.style.transition = 'max-height 0.3s ease-out';
+            historyList.style.overflow = 'hidden';
             historyList.style.margin = '0';
+            historyList.style.display = 'none';
 
             let listIndicator = document.createElement('p');
+            listIndicator.id = 'p-indicator-6bc4f6b722e00a2deb81655804f30d836ea5907d';
             listIndicator.innerText = 'GRADED PREVIOUSLY';
             listIndicator.style.padding = '6px 12px';
             listIndicator.style.margin = '0';
@@ -165,6 +170,21 @@ let interval_checkAvail = setInterval(() => {
             listIndicator.style.textAlign = 'center';
             listIndicator.style.borderRadius = '4px';
             listIndicator.style.fontWeight = '200';
+            listIndicator.onclick = function (){
+                let content = this.nextElementSibling;
+                console.info(content.style.maxHeight);
+                console.info(typeof content.style.maxHeight);
+                if (content.style.maxHeight === '0px'){
+                    content.style.maxHeight = '1000px';
+                    content.style.display = 'block';
+                } else {
+                    content.style.maxHeight = '0';
+                    setTimeout(function(){
+                        content.style.display = 'none';
+                    }, 300);
+
+                }
+            };
 
             let messagesContainer = document.getElementsByClassName('messages')[0];
             messagesContainer.insertBefore(historyList, messagesContainer.firstChild);
