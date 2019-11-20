@@ -75,6 +75,7 @@ let interval_checkAvail = setInterval(() => {
         document.getElementsByClassName('grade-btns')[0].style.display = 'none';
 
         if (!exist) {
+            //TODO Add a flag for sus code button
             let button = document.createElement('button');
             button.innerHTML = "<div class='ld ld-ball ld-bounce'></div>SMART";
             button.classList.add('btn-main-extra-almost');
@@ -130,8 +131,9 @@ let interval_checkAvail = setInterval(() => {
                     assignmentName: assignmentName
                 };
 
+                let CONST_maxHistory = 10;
                 curHistory.push(history_obj);
-                if (curHistory.length > 5) {
+                if (curHistory.length > CONST_maxHistory) {
                     curHistory.shift();
                 }
                 chrome.storage.sync.set({'history_items': curHistory}, function () {
@@ -141,7 +143,11 @@ let interval_checkAvail = setInterval(() => {
                 if (historyList.childElementCount === 0) {
                     historyList.appendChild(history_childContainer);
                 } else {
+                    //TODO Make List an expandable, hideable list
                     historyList.insertBefore(history_childContainer, historyList.childNodes[0]);
+                    while(historyList.childElementCount > CONST_maxHistory){
+                        historyList.childNodes[historyList.childElementCount - 1].remove();
+                    }
                 }
             };
             containerElem.appendChild(button);
@@ -167,9 +173,9 @@ let interval_checkAvail = setInterval(() => {
             chrome.storage.sync.get(['history_items'], function (items) {
                 console.info('history retrieved', items);
                 items.history_items.reverse();
-                console.info(items.history_items.forEach(obj => {
+                items.history_items.forEach(obj => {
                     historyList.appendChild(createUserDisplay(obj.studentName, obj.feedback, obj.curLink, obj.scoreGiven, obj.maxPoints, obj.assignmentName))
-                }))
+                })
             });
         }
 
