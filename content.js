@@ -1,12 +1,71 @@
 console.info('content js loaded from extension');
 
 let curHistory = [];
+let counter_checkCount = 0;
+
+let mutationObserverEventDummy = document.createElement("div");
+
 //todo check if page has been loaded to next user
 
-setTimeout(async () => {
-    if (document.getElementById('max-points') == null) {
+let interval_checkAvail = setInterval(() => {
+    if(counter_checkCount > 10) clearInterval(interval_checkAvail);
+    counter_checkCount ++;
+    if (document.getElementById('max-points') != null) {
 
-    } else {
+        MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+        let observer = new MutationObserver(function (mutations, observer) {
+            // fired when a mutation occurs
+
+            let event; // The custom event that will be created
+            if (document.createEvent) {
+                event = document.createEvent("HTMLEvents");
+                event.initEvent("mutationobserved", true, true);
+                event.eventName = "mutationobserved";
+                mutationObserverEventDummy.dispatchEvent(event);
+            } else {
+                event = document.createEventObject();
+                event.eventName = "mutationobserved";
+                event.eventType = "mutationobserved";
+                mutationObserverEventDummy.fireEvent("on" + event.eventType, event);
+            }
+
+            // console.log(mutations, observer);
+            // ...
+        });
+
+// define what element should be observed by the observer
+// and what types of mutations trigger the callback
+        observer.observe(document, {
+            subtree: true,
+            characterData: true
+            //...
+        });
+
+        function checkForPageUpdate() {
+            return new Promise((resolve, reject) => {
+                let retryCounter = 0;
+
+                let myFunctionReference = function () {
+                    setTimeout(function () {
+                        resolve(1);
+                    }, 100);
+                };
+
+                if (navigator.userAgent.toLowerCase().indexOf('msie') !== -1) {
+                    mutationObserverEventDummy.attachEvent('onmutationobserved', myFunctionReference);
+                } else {
+                    mutationObserverEventDummy.addEventListener('mutationobserved', myFunctionReference, false);
+                }
+
+                setInterval(() => {
+                    if (retryCounter >= 40) reject('retried too many times');
+                    retryCounter++;
+                }, 500)
+            });
+        }
+
+
         let containerElem = document.getElementById('max-points').parentElement;
 
         let exist = document.getElementById('main-btn-ddabd64960e52bf54ef4bc3999e3368ce09f2773') != null;
@@ -19,10 +78,20 @@ setTimeout(async () => {
             let button = document.createElement('button');
             button.innerHTML = "<div class='ld ld-ball ld-bounce'></div>SMART";
             button.classList.add('btn-main-extra-almost');
-            button.classList.add('ld-ext-left');
+            button.classList.add('ld-ext-right');
+            button.classList.remove('running');
             button.id = 'main-btn-ddabd64960e52bf54ef4bc3999e3368ce09f2773';
-            button.onclick = function (e) {
+            button.onclick = async function (e) {
                 button.classList.add('running');
+                button.setAttribute('disabled', 'disabled');
+
+                checkForPageUpdate().then(res => {
+                    button.classList.remove('running');
+                    button.removeAttribute('disabled');
+                }).catch(err => {
+                    console.error('page would not load.. possibly done w/ queue');
+                });
+
                 let needsWorkButton = document.getElementsByClassName('js-needs-work')[0];
                 let fullPointsButton = document.getElementsByClassName('js-give-full-points')[0];
 
@@ -38,14 +107,14 @@ setTimeout(async () => {
                 if (feedback.length === 0) {
                     setTimeout(() => {
                         fullPointsButton.click();
-                    }, 100)
+                    }, 50)
                 } else {
                     document.getElementById('grade-score-input').value = maxPoints - 1;
                     scoreGiven = maxPoints - 1;
                     if (needsWorkButton != null) {
                         setTimeout(() => {
                             needsWorkButton.click();
-                        }, 100);
+                        }, 50);
                     } else {
                         alert('extension broken');
                     }
@@ -92,7 +161,6 @@ setTimeout(async () => {
             listIndicator.style.fontWeight = '200';
 
             let messagesContainer = document.getElementsByClassName('messages')[0];
-            //TODO: Append to Top
             messagesContainer.insertBefore(historyList, messagesContainer.firstChild);
             messagesContainer.insertBefore(listIndicator, messagesContainer.firstChild);
 
@@ -140,40 +208,6 @@ setTimeout(async () => {
             history_childContainer.append(history_studentNameDisplay, history_assignmentNameDisplay, history_scoreDisplay, history_feedbackDisplay);
             return history_childContainer;
         };
+        clearInterval(interval_checkAvail);
     }
-}, 2000);
-
-let mutationObserverEventDummy = document.createElement("div");
-//todo broadcast and listen to events on this object
-
-MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-
-let observer = new MutationObserver(function(mutations, observer) {
-    // fired when a mutation occurs
-
-
-
-    console.log(mutations, observer);
-    // ...
-});
-
-// define what element should be observed by the observer
-// and what types of mutations trigger the callback
-observer.observe(document, {
-    subtree: true,
-    characterData: true
-    //...
-});
-
-function checkForPageUpdate (prevNumRemaining){
-    return new Promise((resolve, reject) => {
-         let retryCounter = 0;
-         setInterval(()=> {
-             if(retryCounter >= 40) reject('retried too many times');
-             retryCounter ++;
-
-
-
-         }, 500)
-    });
-}
+}, 500);
