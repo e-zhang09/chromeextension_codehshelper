@@ -164,7 +164,7 @@ let interval_checkAvail = setInterval(() => {
             let userInput_studentFeedback = document.getElementById('student-feedback');
             userInput_studentFeedback.onkeyup = function(e){
                 if(e.code === 'Backslash'){
-                    userInput_studentFeedback.value = userInput_studentFeedback.value.toString().substr(0, userInput_studentFeedback.value.toString().length-1);
+                    userInput_studentFeedback.value = userInput_studentFeedback.value.toString().replaceAll('\\\\', '');
                     button.click();
                 }
             };
@@ -279,3 +279,8 @@ let interval_checkAvail = setInterval(() => {
         clearInterval(interval_checkAvail);
     }
 }, 500);
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
