@@ -6,12 +6,16 @@
   "description": "wip extension",
 
   "content_scripts": [{
-    "css": ["css/styles.css", "css/loading.css", "css/loading-btn.css"],
+    "css": ["css/styles.css", "css/loading.css", "css/loading-btn.css", "css/icono.min.css"],
     "js": ["content.js"],
     "run_at": "document_idle",
     "matches": ["https://codehs.com/*"]
   }],
   "permissions": [
     "storage"
-  ]
+  ],
+  "background": {
+    "page": "background.html"
+  },
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'; connect-src 'self' wss://*.firebaseio.com;"
 }

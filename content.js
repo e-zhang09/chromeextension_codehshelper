@@ -8,7 +8,7 @@ let mutationObserverEventDummy = document.createElement("div");
 //todo check if page has been loaded to next user
 
 let interval_checkAvail = setInterval(() => {
-    if(counter_checkCount > 10) clearInterval(interval_checkAvail);
+    if(counter_checkCount > 20) clearInterval(interval_checkAvail);
     counter_checkCount ++;
     if (document.getElementById('max-points') != null) {
 
@@ -30,15 +30,17 @@ let interval_checkAvail = setInterval(() => {
                 mutationObserverEventDummy.fireEvent("on" + event.eventType, event);
             }
 
-            // console.log(mutations, observer);
+            console.log(mutations, observer);
             // ...
         });
 
 // define what element should be observed by the observer
 // and what types of mutations trigger the callback
-        observer.observe(document, {
+        observer.observe(document.getElementsByClassName('ace_content')[0], {
             subtree: true,
-            characterData: true
+            characterData: true,
+            attributes: true,
+            childList: true,
             //...
         });
 
@@ -59,7 +61,7 @@ let interval_checkAvail = setInterval(() => {
                 }
 
                 setInterval(() => {
-                    if (retryCounter >= 40) reject('retried too many times');
+                    if (retryCounter >= 20) reject('retried too many times');
                     retryCounter++;
                 }, 500)
             });
@@ -75,7 +77,7 @@ let interval_checkAvail = setInterval(() => {
         document.getElementsByClassName('grade-btns')[0].style.display = 'none';
 
         if (!exist) {
-            //TODO Add a flag for sus code button
+
             let button = document.createElement('button');
             button.innerHTML = "<div class='ld ld-ball ld-bounce'></div>SMART";
             button.classList.add('btn-main-extra-almost');
@@ -90,7 +92,14 @@ let interval_checkAvail = setInterval(() => {
                     button.classList.remove('running');
                     button.removeAttribute('disabled');
                 }).catch(err => {
-                    console.error('page would not load.. possibly done w/ queue');
+                    try{
+                        button.classList.remove('running');
+                        button.removeAttribute('disabled');
+                    }catch{
+                        console.info('page would not load.. possibly done w/ queue');
+                        return;
+                    }
+                    //TODO Could be suspicious
                 });
 
                 let needsWorkButton = document.getElementsByClassName('js-needs-work')[0];
@@ -152,6 +161,36 @@ let interval_checkAvail = setInterval(() => {
             };
             containerElem.appendChild(button);
 
+            let userInput_studentFeedback = document.getElementById('student-feedback');
+            userInput_studentFeedback.onkeyup = function(e){
+                if(e.code === 'Backslash'){
+                    userInput_studentFeedback.value = userInput_studentFeedback.value.toString().substr(0, userInput_studentFeedback.value.toString().length-1);
+                    button.click();
+                }
+            };
+
+            // let headerBar = document.getElementById('assignment-status').parentElement;
+            // let susIndicator = document.createElement('span');
+            // susIndicator.style.cssFloat = 'right';
+            // susIndicator.style.color = 'red';
+            // susIndicator.style.marginRight = '4%';
+            // susIndicator.innerText = 'Suspicious';
+            // susIndicator.style.display = 'none';
+            // headerBar.appendChild(susIndicator);
+            //
+            // let button_flagForSus = document.createElement('a');
+            // button_flagForSus.classList.add('icono-flag');
+            // button_flagForSus.classList.add('tooltip-a');
+            // button_flagForSus.style.marginLeft = '10px';
+            // button_flagForSus.style.color = 'red';
+            //
+            // let tooltip_flagForSus = document.createElement('span');
+            // tooltip_flagForSus.classList.add('tooltiptext-a');
+            // tooltip_flagForSus.innerHTML = 'Mark Student';
+            // button_flagForSus.appendChild(tooltip_flagForSus);
+            //
+            // containerElem.appendChild(button_flagForSus);
+
             let historyList = document.createElement('ul');
             historyList.id = 'ul-history-70c881d4a26984ddce795f6f71817c9cf4480e79';
             historyList.style.maxHeight = '0';
@@ -172,11 +211,13 @@ let interval_checkAvail = setInterval(() => {
             listIndicator.style.fontWeight = '200';
             listIndicator.onclick = function (){
                 let content = this.nextElementSibling;
-                console.info(content.style.maxHeight);
-                console.info(typeof content.style.maxHeight);
+                // console.info(content.style.maxHeight);
+                // console.info(typeof content.style.maxHeight);
                 if (content.style.maxHeight === '0px'){
-                    content.style.maxHeight = '1000px';
                     content.style.display = 'block';
+                    setTimeout(function(){
+                        content.style.maxHeight = '1000px';
+                    }, 1);
                 } else {
                     content.style.maxHeight = '0';
                     setTimeout(function(){
@@ -192,6 +233,7 @@ let interval_checkAvail = setInterval(() => {
 
             chrome.storage.sync.get(['history_items'], function (items) {
                 console.info('history retrieved', items);
+                if(items.history_items == null) return;
                 items.history_items.reverse();
                 items.history_items.forEach(obj => {
                     historyList.appendChild(createUserDisplay(obj.studentName, obj.feedback, obj.curLink, obj.scoreGiven, obj.maxPoints, obj.assignmentName))
