@@ -8,8 +8,8 @@ let mutationObserverEventDummy = document.createElement("div");
 //todo check if page has been loaded to next user
 
 let interval_checkAvail = setInterval(() => {
-    if(counter_checkCount > 20) clearInterval(interval_checkAvail);
-    counter_checkCount ++;
+    if (counter_checkCount > 20) clearInterval(interval_checkAvail);
+    counter_checkCount++;
     if (document.getElementById('max-points') != null) {
 
         MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
@@ -92,10 +92,10 @@ let interval_checkAvail = setInterval(() => {
                     button.classList.remove('running');
                     button.removeAttribute('disabled');
                 }).catch(err => {
-                    try{
+                    try {
                         button.classList.remove('running');
                         button.removeAttribute('disabled');
-                    }catch{
+                    } catch {
                         console.info('page would not load.. possibly done w/ queue');
                         return;
                     }
@@ -154,7 +154,7 @@ let interval_checkAvail = setInterval(() => {
                 } else {
                     //TODO Make List an expandable, hideable list
                     historyList.insertBefore(history_childContainer, historyList.childNodes[0]);
-                    while(historyList.childElementCount > CONST_maxHistory){
+                    while (historyList.childElementCount > CONST_maxHistory) {
                         historyList.childNodes[historyList.childElementCount - 1].remove();
                     }
                 }
@@ -162,8 +162,8 @@ let interval_checkAvail = setInterval(() => {
             containerElem.appendChild(button);
 
             let userInput_studentFeedback = document.getElementById('student-feedback');
-            userInput_studentFeedback.onkeyup = function(e){
-                if(e.code === 'Backslash'){
+            userInput_studentFeedback.onkeyup = function (e) {
+                if (e.code === 'Backslash') {
                     userInput_studentFeedback.value = userInput_studentFeedback.value.toString().replaceAll('\\\\', '');
                     button.click();
                 }
@@ -209,18 +209,18 @@ let interval_checkAvail = setInterval(() => {
             listIndicator.style.textAlign = 'center';
             listIndicator.style.borderRadius = '4px';
             listIndicator.style.fontWeight = '200';
-            listIndicator.onclick = function (){
+            listIndicator.onclick = function () {
                 let content = this.nextElementSibling;
                 // console.info(content.style.maxHeight);
                 // console.info(typeof content.style.maxHeight);
-                if (content.style.maxHeight === '0px'){
+                if (content.style.maxHeight === '0px') {
                     content.style.display = 'block';
-                    setTimeout(function(){
+                    setTimeout(function () {
                         content.style.maxHeight = '1000px';
                     }, 1);
                 } else {
                     content.style.maxHeight = '0';
-                    setTimeout(function(){
+                    setTimeout(function () {
                         content.style.display = 'none';
                     }, 300);
 
@@ -233,7 +233,7 @@ let interval_checkAvail = setInterval(() => {
 
             chrome.storage.sync.get(['history_items'], function (items) {
                 console.info('history retrieved', items);
-                if(items.history_items == null) return;
+                if (items.history_items == null) return;
                 items.history_items.reverse();
                 items.history_items.forEach(obj => {
                     historyList.appendChild(createUserDisplay(obj.studentName, obj.feedback, obj.curLink, obj.scoreGiven, obj.maxPoints, obj.assignmentName))
@@ -280,7 +280,7 @@ let interval_checkAvail = setInterval(() => {
     }
 }, 500);
 
-String.prototype.replaceAll = function(search, replacement) {
+String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
